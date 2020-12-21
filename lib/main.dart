@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:justnews/screens/splashscreen1.dart';
-import 'package:justnews/screens/splashscreen1.dart';
-import 'package:justnews/screens/main_screen.dart';
-import 'package:justnews/screens/onboarding.dart';
-import 'package:justnews/screens/splashscreen1.dart';
 import 'package:justnews/screens/tabs/splashscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 int initScreen;
 Future main() async{
@@ -38,6 +33,7 @@ class MaterialAPP extends StatelessWidget {
             primarySwatch: Colors.blue,
             visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
+
           home: initScreen == 0 || initScreen == null
           ? SplashScreen1() : SplashScreen(),
     );
