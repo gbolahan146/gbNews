@@ -25,7 +25,7 @@ dependencies:
   url_launcher: ^5.5.0
   like_button: ^1.0.3
   after_layout: ^1.0.7+2
-  flutter_share: ^1.0.2+1
+  flutter_share: ^1.0.5
   google_fonts:
   lottie: ^0.6.0
   concentric_transition: ^0.1.1

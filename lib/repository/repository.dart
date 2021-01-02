@@ -2,13 +2,17 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:justnews/model/article_response.dart';
 import 'package:justnews/model/source_response.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NewsRepository {
   static String mainUrl = "https://newsapi.org/v2/";
   String apiKey = DotEnv().env['apiKey'];
   final String apiKey2 = DotEnv().env['apiKey2'];
+
+  final List apiKeysList = [DotEnv().env['apiKey'],DotEnv().env['apiKey2']];
   String errResponse;
   String exhaustedError = 'apiKeyExhausted';
+
 
   final Dio _dio = Dio();
 
@@ -16,23 +20,42 @@ class NewsRepository {
   var getTopHeadlinesUrl = "$mainUrl/top-headlines";
   var everythingUrl = "$mainUrl/everything";
 
-  Future<SourceResponse> getSources() async {
+  //TODO: This is where I implemented it.
+
+  ///@index is the index in the API KEYS array to access.
+  ///The count is to keep count of number of times the network is called.
+  ///and is used to exit the recursion.
+  Future<SourceResponse> getSources(int index,int count) async {
+    if(count >= apiKeysList.length ) {
+      //I don't know the preferred response to pass here, just passing this one.
+      return SourceResponse.withError(exhaustedError);
+    }
+
+    if(index == apiKeysList.length) {
+      index = 0;
+    }
     var params = {
-      "apiKey": apiKey,
+      "apiKey": apiKeysList[index],
       "language": "en",
     };
     try {
-      Response response =
-          await _dio.get(getSourcesUrl, queryParameters: params);
+      Response response = await _dio.get(getSourcesUrl, queryParameters: params);
+      if(response.statusCode == 200) {
+          //reshuffle the list.
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setInt('ValidApiKey', index);
+      }
       return SourceResponse.fromJson(response.data);
     } catch (error) {
       errResponse = error.response.data["code"].toString();
       if (errResponse == exhaustedError) {
-        apiKey = apiKey2;
+        getSources(++index,++count);
       }
       return SourceResponse.withError(error);
     }
   }
+
+
 
   Future<SourceResponse> getNgSources() async {
     var params = {"apiKey": apiKey, "language": "en", "country": "ng"};
